@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <style>
+            #main {
+                text-align: center;
+            }
+
+            .box {
+                height: 10px;
+                width: 10px;
+                margin-right: 1px;
+                display: inline-block;
+            }
+
+            #grid {
+                line-height: 11px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+            <button id="next" onclick="next()">Next generation</button>
+            <br>
+            <br>
+            <div id="grid"></div>
+        </div>
+
+        <script>
+            //setup
+            const grid = document.getElementById('grid')
+              , size = 49;
+
+            for (let y = 0; y < size; y++) {
+                if (y > 0) {
+                    let br = document.createElement('br');
+                    br.type = 'br';
+                    grid.appendChild(br);
+                }
+                for (let x = 0; x < size; x++) {
+                    let box = document.createElement('div');
+                    box.className = 'box';
+                    box.id = `checkbox${x}-${y}`;
+
+                    let value = Math.round(Math.random());
+                    box.dataset.val = value;
+
+                    if (value === 0) {
+                        box.style.backgroundColor = 'white';
+                    }
+                    if (value === 1) {
+                        box.style.backgroundColor = 'black';
+                    }
+                    grid.appendChild(box);
+
+                }
+            }
+
+            function next() {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        let box = document.getElementById(`checkbox${x}-${y}`);
+
+                        let neighborNumber=neighborsAlive(x, y);
+
+                        //if already alive
+                    if (box.dataset.val == 1){
+                        //live
+                        if ( neighborNumber== 2 || neighborNumber == 3) {
+                             box.dataset.nextValue = 1;
+                         }
+                        else{
+                            //or die
+                            box.dataset.nextValue = 0;
+                            box.style.backgroundColor = 'white';
+                            }
+                      }
+                      else{//if dead
+                        //reproduce
+                        if ( neighborNumber == 3) {
+                             box.dataset.nextValue = 1;
+                             box.style.backgroundColor = 'black';
+                         }
+                         else{
+                            box.dataset.nextValue = 0;
+                         }
+                      }
+
+
+                    }
+                }
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        let box = document.getElementById(`checkbox${x}-${y}`);
+                        box.dataset.val = box.dataset.nextValue;
+
+                    }
+                }
+            }
+
+            function neighborsAlive(x, y) {
+                let coor = [[x - 1, y - 1], [x, y - 1], [x + 1, y - 1], [x - 1, y], [x + 1, y], [x - 1, y + 1], [x, y + 1], [x + 1, y + 1]],
+                    n = 0;
+                for (c of coor) {
+                    if ((c[0] >= 0 && c[1] >= 0) && (c[0] < size && c[1] < size)) {
+                        box = document.getElementById(`checkbox${c[0]}-${c[1]}`);
+                        if (box.dataset.val == 1) {
+                            n += 1;    
+                        }
+                    }
+                }
+                return n;
+            }
+
+
+            setInterval(next, 100);
+
+        </script>
+
+    </body>
+</html>

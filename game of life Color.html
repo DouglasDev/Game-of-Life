@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <style>
+            #main {
+                text-align: center;
+            }
+
+            .box {
+                height: 10px;
+                width: 10px;
+                margin-right: 1px;
+                display: inline-block;
+            }
+
+            #grid {
+                line-height: 11px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main">
+            <button id="next" onclick="next()">Next generation</button>
+            <br>
+            <br>
+            <div id="grid"></div>
+        </div>
+
+        <script>
+            //setup
+            const grid = document.getElementById('grid')
+              , size = 20
+              ,change= .1;
+
+            for (let y = 0; y < size; y++) {
+                if (y > 0) {
+                    let br = document.createElement('br');
+                    br.type = 'br';
+                    grid.appendChild(br);
+                }
+                for (let x = 0; x < size; x++) {
+                    let box = document.createElement('div');
+                    box.className = 'box';
+                    box.id = `checkbox${x}-${y}`;
+
+                    let value = Math.random();
+                    box.dataset.val = value;
+
+                    box.style.backgroundColor = valueToRGB(value);
+                    grid.appendChild(box);
+
+                }
+            }
+
+            function next() {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        let box = document.getElementById(`checkbox${x}-${y}`);
+
+                        val= parseFloat(box.dataset.val);
+
+                        let neighborNumber=neighborsAlive(x, y);
+                            box.dataset.neighborNumber = neighborNumber;
+                        //if already alive
+                 //   if (box.dataset.val >=.5){
+                        //live
+                        if ( neighborNumber<= 2 && neighborNumber >= 0) {
+                             box.dataset.nextValue = val+change;
+                             if (box.dataset.nextValue>1){box.dataset.nextValue=1}
+                         }
+                        else{
+                            //or die
+                            box.dataset.nextValue = val-change;
+                            if (box.dataset.nextValue<0){box.dataset.nextValue=0}
+
+                            }
+                //      }
+                      // else{//if dead
+                      //   //reproduce
+                      //   if ( neighborNumber == 3) {
+                      //        box.dataset.nextValue = box.dataset.val+change;
+                      //    }
+                      //    else{
+                      //       box.dataset.nextValue = box.dataset.val-change;
+                      //    }
+                      // }
+
+
+                    }
+                }
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        let box = document.getElementById(`checkbox${x}-${y}`);
+                        box.dataset.val = box.dataset.nextValue;
+                        box.style.backgroundColor = valueToRGB(box.dataset.val);
+                    }
+                }
+            }
+
+            function neighborsAlive(x, y) {
+                let coor = [[x - 1, y - 1], [x, y - 1], [x + 1, y - 1], [x - 1, y], [x + 1, y], [x - 1, y + 1], [x, y + 1], [x + 1, y + 1]],
+                    n = 0;
+                for (c of coor) {
+                    if ((c[0] >= 0 && c[1] >= 0) && (c[0] < size && c[1] < size)) {
+                        box = document.getElementById(`checkbox${c[0]}-${c[1]}`);
+                            n += box.dataset.val;    
+                        
+                    }
+                }
+                return parseFloat(n);
+            }
+
+            function valueToRGB(v){
+                return rgb(255-v*255,0,v*255);
+            }
+            function rgb(r, g, b){
+                r = Math.floor(r);
+                g = Math.floor(g);
+                b = Math.floor(b);
+                return ["rgb(",r,",",g,",",b,")"].join("");
+}
+
+            setInterval(next, 100);
+
+        </script>
+
+    </body>
+</html>
